@@ -67,18 +67,14 @@ class ListFragment : Fragment() {
          //En la vista, si existe algun eror esto lo muestra
          viewModel.dogsLoadError.observe(this, Observer { isError ->
              isError?.let {
-                 listError.visibility = View.VISIBLE
+                 listError.visibility = if(it) View.VISIBLE else View.GONE
              }
          })
 
          // en la vista si se esta cargando, muestra el spinner, sino desaparece
-         viewModel.dogsLoadError.observe(this, Observer { isLoading ->
+         viewModel.loading.observe(this, Observer { isLoading ->
              isLoading?.let {
-                 loadingView.visibility = if(it) {
-                     View.VISIBLE //si esta cargando, mostrar el spinner
-                 } else {
-                     View.GONE // no mostrar
-                 }
+                 loadingView.visibility = if(it) View.VISIBLE else View.GONE
                  //mostrar las otras vistas dependiendo del spinner
                  if (it) {
                      listError.visibility = View.GONE //ocultar vista (solo mostrar spinner)
