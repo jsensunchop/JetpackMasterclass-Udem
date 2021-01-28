@@ -8,4 +8,5 @@ data class DogBreed(
     val bredFor: String?,
     val temperament: String?,
     val imageUrl: String?
+
 )
