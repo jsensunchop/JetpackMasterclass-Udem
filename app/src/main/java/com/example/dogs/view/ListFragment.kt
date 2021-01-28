@@ -53,11 +53,19 @@ class ListFragment : Fragment() {
             //attach the adapter
             adapter = dogListAdapter
         }
+
+        refreshLayout.setOnRefreshListener { //configurando funcionalidades del refresh
+            dogsList.visibility = View.GONE
+            listError.visibility = View.GONE
+            loadingView.visibility = View.VISIBLE
+            viewModel.refresh()
+            refreshLayout.isRefreshing = false
+        }
         observeViewModel()
     }
      //esta funcion sirve para usar las variables que se crearon en el ListViewModel para actualizar el layout basado en los valores que se tomen
    fun observeViewModel(){
-         viewModel.dogs.observe(this, Observer { dogs ->
+         viewModel.dogs.observe(this, Observer { dogs -> //dogs es un mutablelivedata OJO
              dogs?.let { //verificacion de nulidad
                  dogsList.visibility = View.VISIBLE
                  dogListAdapter.updateDogList(dogs)
