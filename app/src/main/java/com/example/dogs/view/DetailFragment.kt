@@ -34,7 +34,7 @@ class DetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         //passing the argumentes
-
+        //commit (new lecture)
 
         /*
         buttonList.setOnClickListener {
