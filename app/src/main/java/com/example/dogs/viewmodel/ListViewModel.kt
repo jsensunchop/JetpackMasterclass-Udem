@@ -32,6 +32,7 @@ class ListViewModel : ViewModel() {
     fun refresh(){
        fetchFromRemote()
     }
+    //ROOM implementation flag (not code above)
     private fun fetchFromRemote(){ //traer data del api
         loading.value = true
         disposable.add(
