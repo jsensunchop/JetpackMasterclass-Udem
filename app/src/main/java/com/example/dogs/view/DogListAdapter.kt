@@ -7,6 +7,8 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dogs.R
 import com.example.dogs.model.DogBreed
+import com.example.dogs.util.getProgressDrawable
+import com.example.dogs.util.loadImage
 import kotlinx.android.synthetic.main.item_dog.view.*
 
 //standart adapter
@@ -34,6 +36,9 @@ class DogListAdapter (val dogsList: ArrayList<DogBreed>): RecyclerView.Adapter<D
         holder.view.setOnClickListener {
             Navigation.findNavController(it).navigate(ListFragmentDirections.actionDetailFragment())
         }
+        //esta linea de codigo se enlaza con el Util.kt que usa Glide
+        holder.view.imageView.loadImage(dogsList[position].imageUrl, getProgressDrawable(holder.view.imageView.context))// esto cargara automaticamente todas las imagenes de la data (perros)
+//        en nuestra lista
     }
 
     class DogViewHolder(var view: View) : RecyclerView.ViewHolder(view)
