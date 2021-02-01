@@ -1,6 +1,7 @@
 package com.example.dogs.viewmodel
 
 import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.dogs.model.DogBreed
@@ -17,6 +18,8 @@ import kotlinx.coroutines.launch
 class ListViewModel(application: Application) : BaseViewModel(application) {
     //------------------------------------------StoringTime-SharedPreferences---------------------------------------------------------------------
     private var prefHelper =  SharedPreferencesHelper(getApplication())
+    //------------------------------------------Retreving the information------------------------------------------------------------------------
+    private var refreshTime = 5 * 60 * 1000 * 1000 * 1000L
     //-----------------------------------------------REMOTE API-------------------------------------------------------------------------*---------
     private val dogService = DogsApiService()
     private val disposable = CompositeDisposable() //allow us to retrieve or observe the observable (single) that the API gives us and not having
@@ -33,10 +36,31 @@ class ListViewModel(application: Application) : BaseViewModel(application) {
     //mostrara un spinner al usuario
     val loading = MutableLiveData<Boolean>()
 
-    //TBD
+
     fun refresh(){
-       fetchFromRemote()
+        val updateTime = prefHelper.getUpdateTime()
+        if(updateTime != null && updateTime != 0L && System.nanoTime() - updateTime < refreshTime){
+            fetchFromDatabase()
+        }
+        else{
+            fetchFromRemote()
+        }
     }
+
+    fun refreshBypassCache(){
+        fetchFromRemote()
+    }
+
+    private fun fetchFromDatabase(){
+        loading.value = true
+        launch {
+            val dogs = DogDatabase(getApplication()).dogDao().getAllDogs()
+            dogsRetrieved(dogs)
+            Toast.makeText(getApplication(), "Dogs retrieved from Database", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
     //ROOM implementation flag (not code above)
     private fun fetchFromRemote(){ //traer data del api
         loading.value = true
@@ -54,6 +78,7 @@ class ListViewModel(application: Application) : BaseViewModel(application) {
                         loading.value = false
                          */
                         storeDogsLocally(dogList)
+                        Toast.makeText(getApplication(), "Dogs retrieved from Endpoint", Toast.LENGTH_SHORT).show()
 
                     }
 
