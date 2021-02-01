@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.dogs.model.DogBreed
 import com.example.dogs.model.DogDatabase
 import com.example.dogs.model.DogsApiService
+import com.example.dogs.util.SharedPreferencesHelper
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -14,8 +15,9 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.launch
 
 class ListViewModel(application: Application) : BaseViewModel(application) {
-
-    //-----------------------------------------------REMOTE API-------------------------------------------------------------------------
+    //------------------------------------------StoringTime-SharedPreferences---------------------------------------------------------------------
+    private var prefHelper =  SharedPreferencesHelper(getApplication())
+    //-----------------------------------------------REMOTE API-------------------------------------------------------------------------*---------
     private val dogService = DogsApiService()
     private val disposable = CompositeDisposable() //allow us to retrieve or observe the observable (single) that the API gives us and not having
     //to worry about it
@@ -86,6 +88,8 @@ class ListViewModel(application: Application) : BaseViewModel(application) {
             }
             dogsRetrieved(list)
         }
+        //------------------------------------------StoringTime-SharedPreferences---------------------------------------------------------------------
+        prefHelper.saveUpdateTime(System.nanoTime())
     }
 
     override fun onCleared() {
