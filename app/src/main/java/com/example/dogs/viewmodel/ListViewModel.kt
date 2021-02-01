@@ -1,16 +1,19 @@
 package com.example.dogs.viewmodel
 
+import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.dogs.model.DogBreed
+import com.example.dogs.model.DogDatabase
 import com.example.dogs.model.DogsApiService
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.launch
 
-class ListViewModel : ViewModel() {
+class ListViewModel(application: Application) : BaseViewModel(application) {
 
     //-----------------------------------------------REMOTE API-------------------------------------------------------------------------
     private val dogService = DogsApiService()
@@ -48,6 +51,7 @@ class ListViewModel : ViewModel() {
                         dogsLoadError.value = false
                         loading.value = false
                          */
+                        storeDogsLocally(dogList)
 
                     }
 
@@ -68,7 +72,20 @@ class ListViewModel : ViewModel() {
     }
 
     private fun storeDogsLocally(list: List<DogBreed>){
-        
+        //cada vez que se quiera acceder a la basededatos necesitamos que sea de un background threat, la forma mas facil de hacer esto
+        //es mediante code routines
+
+        launch {
+            val dao = DogDatabase(getApplication()).dogDao()
+            dao.deleteAllDogs()
+            val result = dao.insertAll(*list.toTypedArray())//toma una lista de elementos y la exapnde en elementos individuales que se pasa a la funcion insert
+            var i=0
+            while (i < list.size){
+                list[i].uuid = result[i].toInt()
+                ++i
+            }
+            dogsRetrieved(list)
+        }
     }
 
     override fun onCleared() {
